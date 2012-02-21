@@ -58,6 +58,10 @@ If not any filemode is supplied, 'open-uri' is used:
 
 Credentials can be supplied with the DAVUSER and DAVPASS environment variables. If not set, ruby will prompt for username and password. On OS X the password will then be stored encrypted in the Keychain and reused later.
 
+# Install
+
+This is work in progress, and not pushed as a gem yet.
+
 # Credits
 
   * Tanaka Akira for the inspiration taken from 'open-uri' standard library.

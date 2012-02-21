@@ -39,6 +39,8 @@ class WebDavAgent < StringIO
     else
       osx =  (RUBY_PLATFORM =~ /darwin/)
       if(osx)then
+
+        # TODO Do not crash if 'osx_keychain' is not present!
         require 'osx_keychain'
         keychain = OSXKeychain.new
         password = keychain[@uri.host, username ]
@@ -222,21 +224,5 @@ class File
       self.original_open(name, *rest, &block)
     end
   end
-
-end
-
-
-if __FILE__ == $0
-
-  open('local_test_file.html','w') do |io|
-    io.puts "Some more content"
-  end
-
-  open('https://www-dav.example.com/foo.html','a') do |io|
-    io.puts "Some content"
-  end
-
-  io = open('https://www-dav.example.com/foo.html','a')
-  io.puts "Some more content"
 
 end

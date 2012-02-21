@@ -13,7 +13,7 @@ It is possible to open an http, https URL and write to it as though it were a fi
   }
 ```
 
-Another way to do the same:
+A more compact way would be:
 
 ```ruby
   open("http://www.ruby-lang.org/open_uri_and_write.html","w").puts "<h1>OpenUriAndWrite</h1>"
@@ -53,6 +53,10 @@ If not any filemode is supplied, 'open-uri' is used:
 ```ruby
   puts open("http://www.ruby-lang.org").read
 ```
+
+# Credentials
+
+Credentials can be supplied with the DAVUSER and DAVPASS environment variables. If not set, ruby will prompt for username and password. On OS X the password will then be stored encrypted in the Keychain and reused later.
 
 # Credits
 

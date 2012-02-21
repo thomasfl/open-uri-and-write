@@ -33,7 +33,7 @@ Directories are created the same way as local files.
 
 # Proppatch and Propfind
 
-The only difference between files and directories stored locally and on webdav enabled servers, is the properties extra properties directories and files can have. Properties are set with proppatch() and accessed propfind().
+The only difference between local files and directories and remote files and directories on webdav servers, is that they both can have an infinite amount of properties. Properties are set as a xml snippet with proppatch() and accessed with propfind().
 
 ```ruby
     File.open("http://www.ruby-lang.org/open_uri_and_write.html","w").proppatch('<o:Author>Douglas Groncki</o:Author>')

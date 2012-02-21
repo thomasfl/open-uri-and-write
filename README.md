@@ -13,6 +13,13 @@ It is possible to open an http, https URL and write to it as though it were a fi
   }
 ```
 
+Another way to do the same:
+
+```ruby
+  open("http://www.ruby-lang.org/open_uri_and_write.html","w").puts "<h1>OpenUriAndWrite</h1>"
+```
+
+
 Directories are created just as normally.
 
 ```ruby

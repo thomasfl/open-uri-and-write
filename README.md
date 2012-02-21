@@ -19,8 +19,13 @@ Another way to do the same:
   open("http://www.ruby-lang.org/open_uri_and_write.html","w").puts "<h1>OpenUriAndWrite</h1>"
 ```
 
+Files can be deleted as local files:
 
-Directories are created just as normally.
+```ruby
+  File.delete("http://www.ruby-lang.org/open_uri_and_write.html")
+```
+
+Directories are created the same way as local files.
 
 ```ruby
   Dir.mkdir("http://www.ruby-lang.org/open_uri_and_write")

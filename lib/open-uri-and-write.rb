@@ -94,7 +94,7 @@ module Kernel
   def open(name, *rest, &block) # :doc:
     if name.respond_to?(:open)
       name.open(*rest, &block)
-    elsif name.respond_to?(:to_s) && name[/^(https?):\/\//] && rest.size > 0 && rest.first.to_s[/^w/]
+    elsif name.respond_to?(:to_s) and name[/^(https?):\/\//] and rest.size > 0 and rest.first.to_s[/^w/]
       webdav_agent = WebDavAgent.new(name, rest)
       if(block)
         yield webdav_agent
@@ -138,7 +138,7 @@ class Dir
   end
 
   def self.mkdir(name)
-    if name.respond_to?(:to_s) && name[/^(https?):\/\//]
+    if name.respond_to?(:to_s) and name[/^(https?):\/\//]
       dav = WebDavCredentialsPool.get_connection_for_url(name)
       dav.mkdir(name)
     else
@@ -147,7 +147,7 @@ class Dir
   end
 
   def self.rmdir(name)
-    if name.respond_to?(:to_s) && name[/^(https?):\/\//]
+    if name.respond_to?(:to_s) and name[/^(https?):\/\//]
       dav = WebDavCredentialsPool.get_connection_for_url(name)
       dav.delete(name)
     else
@@ -156,7 +156,7 @@ class Dir
   end
 
   def self.propfind(name)
-    if name.respond_to?(:to_s) && name[/^(https?):\/\//]
+    if name.respond_to?(:to_s) and name[/^(https?):\/\//]
       dav = WebDavCredentialsPool.get_connection_for_url(name)
       dav.propfind(name)
     else
@@ -165,7 +165,7 @@ class Dir
   end
 
   def self.proppatch(name,xml_snippet)
-    if name.respond_to?(:to_s) && name[/^(https?):\/\//]
+    if name.respond_to?(:to_s) and name[/^(https?):\/\//]
       dav = WebDavCredentialsPool.get_connection_for_url(name)
       dav.propfind(name, xml_snippet)
     else
@@ -213,7 +213,7 @@ class File
   def self.open(name, *rest, &block)
     if name.respond_to?(:open)
       name.open(*rest, &block)
-    elsif name.respond_to?(:to_s) && name[/^(https?):\/\//] && rest.size > 0 && rest.first.to_s[/^w/]
+    elsif name.respond_to?(:to_s) and name[/^(https?):\/\//] and rest.size > 0 and rest.first.to_s[/^w/]
       webdav_agent = WebDavAgent.new(name, rest)
       if(block)
         yield webdav_agent

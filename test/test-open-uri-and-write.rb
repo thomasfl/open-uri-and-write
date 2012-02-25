@@ -106,11 +106,6 @@ class TestFilewatcher < Test::Unit::TestCase
     assert( !File.exists?(webdav_url) )
   end
 
-  should "append to file" do
-    # TODO: reimplement 'a','a+','w+' mode etc.
-    # See http://www.techotopia.com/index.php/Working_with_Files_in_Ruby
-  end
-
   should "create and delete directory" do
     timestamp = Time.now.to_s
     webdav_url = 'https://www-dav.usit.uio.no/om/organisasjon/web/wapp/ansatte/thomasfl/apollon/new_folder'
@@ -124,6 +119,11 @@ class TestFilewatcher < Test::Unit::TestCase
     # Support Dir.pwd, Dir.directory?
   end
 
+  should "find files in directories using Dir.entries method" do
+    # TODO: Monkeypatch Dir.entries and Dir.glob and Dir[foo]
+    #   http://stackoverflow.com/questions/2370702/one-liner-to-recursively-list-directories-in-ruby
+  end
+
   should "let Dir class respons to propfind and proppatch" do
     webdav_url = 'https://www-dav.usit.uio.no/om/organisasjon/web/wapp/ansatte/thomasfl/apollon/'
     props = Dir.propfind(webdav_url)
@@ -132,6 +132,7 @@ class TestFilewatcher < Test::Unit::TestCase
   end
 
   should "be able to supply username and password as parameter to open" do
+    # TODO: This is not documented!
     webdav_url = 'https://www-dav.usit.uio.no/om/organisasjon/web/wapp/ansatte/thomasfl/apollon/test.txt'
     file = open(webdav_url, 'w', :webdav_username => 'username', :webdav_password => 'secret')
     begin

@@ -1,6 +1,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/dav4rack_testserver')
 
+# To run:
+#  $ ruby spec/integration/open-uri-and-write-spec.r
+
 describe "OpenUriAndWrite" do
 
   before(:all) do

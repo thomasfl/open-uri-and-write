@@ -7,6 +7,7 @@ require 'spec/autorun'
 require 'net/http'
 require 'uri'
 require 'pathname'
+require 'nokogiri'
 
 ENV['DAVUSER'] = 'dummy'
 ENV['DAVPASS'] = 'dummy'

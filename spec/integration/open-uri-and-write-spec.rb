@@ -30,7 +30,7 @@ describe "OpenUriAndWrite" do
   end
 
 
-  it "should be no problem to write local files" do
+  it "should write to local file normally" do
     timestamp = Time.now.to_s
     filename = '/tmp/local_test_file.txt'
     file = open(filename,'w')
@@ -43,7 +43,7 @@ describe "OpenUriAndWrite" do
 
   it "should write files to webdav server" do
     timestamp = Time.now.to_s
-    webdav_url = @base_uri + 'webdav_test.txt'
+    webdav_url = @base_uri + 'webdav_test_1.txt'
     file = open(webdav_url,'w')
     file.puts timestamp
     file.close
@@ -51,6 +51,59 @@ describe "OpenUriAndWrite" do
     # use standard lib 'open-uri' to read:
     file = open(webdav_url).read.strip.should == timestamp
   end
+
+  it "should write to files with block syntax" do
+    timestamp = Time.now.to_s
+    webdav_url = @base_uri + 'webdav_test_2.txt'
+    open(webdav_url,'w') do |file|
+      file.puts timestamp
+    end
+
+    file = open(webdav_url).read.strip.should == timestamp
+  end
+
+  it "should open write to file with the file class and flush with close" do
+    timestamp = Time.now.to_s
+    webdav_url = @base_uri + 'webdav_test_3.txt'
+    file = File.open(webdav_url,'w')
+    file.puts(timestamp)
+    file.puts('XYZ')
+    file.close
+
+    open(webdav_url,'w').read.strip.should ==  timestamp + "\nXYZ"
+  end
+
+  it "should read properties of files" do
+    filename = 'webdav_test_4.txt'
+    webdav_url = @base_uri + filename
+    open(webdav_url,'w').puts(Time.now.to_s)
+
+    properties = open(webdav_url,'w').propfind
+    displayname = properties.xpath("//d:displayname", "d" => "DAV:").text
+    displayname.should == filename
+  end
+
+  it "should set properties on files" do
+    filename = 'webdav_test_5.txt'
+    webdav_url = @base_uri + filename
+    open(webdav_url,'w').puts(Time.now.to_s)
+
+    # properties = open(webdav_url,'w').propfind
+    # property = properties.to_s[/publish-date>([^<]*)/,1]
+    # puts "Prop:" + property.to_s
+
+    publish_date = Time.now.httpdate.to_s
+    open(webdav_url,'w').proppatch("<D:publish-date>#{publish_date}</D:publish-date>")
+    properties = open(webdav_url,'w').propfind
+    property = properties.to_s[/publish-date>([^<]*)/,1]
+    # publish_date = properties.xpath("//publish-date","D" => "DAV").text
+
+    property.should == publish_date
+  end
+
+  # TODO test authentication
+
+
 
 
   after(:each) do

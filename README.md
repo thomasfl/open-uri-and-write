@@ -45,22 +45,30 @@ The only difference between local files and directories and remote files and dir
 To not interfer with the 'open-uri' standard library, the 'open-uri-and-write' gem is only active in file modes 'w','a','w+' and 'a+':
 
 ```ruby
-  open("http://www.ruby-lang.org/open_uri_and_write.html","w").puts("<h1>HTML</h1>")
+  open("http://www.ruby-lang.org/open_uri_and_write.html","w").puts("<h1>HTML</h1>") # open-uri-and-write
 ```
 
 If not any filemode is supplied, 'open-uri' is used:
 
 ```ruby
-  puts open("http://www.ruby-lang.org").read
+  puts open("http://www.ruby-lang.org").read()  # open-uri
 ```
 
-# Credentials
+# Authentication
 
-Credentials can be supplied with the DAVUSER and DAVPASS environment variables. If not set, ruby will prompt for username and password. On OS X the password will then be stored encrypted in the Keychain and reused later.
+As a default 'open-uri-and-write' will prompt for username and password. Credentials can be supplied with the DAVUSER and DAVPASS environment variables. If enviorment variables are not set, ruby will prompt for username and password. On OS X the password will then be stored encrypted in the Keychain and reused later.
 
 # Install
 
 This is work in progress, and not pushed as a gem yet.
+
+# Testing
+
+The tests will start a webserver at startup. To run all tests simply:
+
+```
+  $ ruby spec/integration/open-uri-and-write-spec.rb
+```
 
 # Credits
 

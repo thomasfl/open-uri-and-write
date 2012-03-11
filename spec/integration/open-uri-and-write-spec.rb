@@ -2,33 +2,17 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/dav4rack_testserver')
 
 # To run:
-#  $ ruby spec/integration/open-uri-and-write-spec.r
+#  $ ruby spec/integration/open-uri-and-write-spec.rb
 
 describe "OpenUriAndWrite" do
 
   before(:all) do
-    port = "3003"
-    @base_uri = "http://localhost:#{port}/"
-    if(not(server_up?(@base_uri)))
-      options = {}
-      # options[:username] = "davuser"
-      # options[:password] = "davpass"
-      options[:root] = Pathname.new(File.expand_path(File.dirname(__FILE__))).parent.to_s + '/fixtures'
-
-      # Start webdav server in subprocess
-      @pid = fork do
-        start_dav4rack(port, options)
-      end
-      exit(0) if(@pid == nil)
-      wait_for_server(@base_uri)
-    else
-      puts "Server is running."
-    end
+    start_webdav_server(:port => 3003)
+    @base_uri = "http://localhost:3003/"
   end
 
   before(:each) do
   end
-
 
   it "should write to local file normally" do
     timestamp = Time.now.to_s
@@ -39,7 +23,6 @@ describe "OpenUriAndWrite" do
 
     open(filename).read.strip.should == timestamp
   end
-
 
   it "should write files to webdav server" do
     timestamp = Time.now.to_s
@@ -103,6 +86,39 @@ describe "OpenUriAndWrite" do
 
   # TODO test authentication
 
+  # TODO Directories
+  it "should create and delete directory" do
+    # timestamp = Time.now.to_s
+    webdav_url = @base_uri + 'new_folder'
+    Dir.mkdir(webdav_url)
+    File.exists?(webdav_url).should == true
+
+    Dir.rmdir(webdav_url)
+    # File.exists?(webdav_url).should == false
+
+    # TODO let 'delete' and 'unlink' be aliases for 'rmdir'
+    # Support Dir.pwd, Dir.directory?
+  end
+
+  it "should not matter which order the rubygems 'open-uri' and 'open-uri-and-write' is loaded" do
+    # http://ruby-doc.org/core-1.9.3/Object.html
+    # http://stackoverflow.com/questions/335530/how-do-you-detect-that-monkey-patching-has-occurred-in-ruby
+    # http://blog.sidu.in/2007/12/rubys-methodadded.html
+    
+  end
+
+
+  it "should to handle username and password supplied as parameter to open" do
+    # TODO: This is not documented!
+    webdav_url = @base_uri + 'yet_another_testfile.txt'
+    file = open(webdav_url, 'w', :webdav_username => 'username', :webdav_password => 'secret')
+    begin
+      file.read
+      should fail
+    rescue Exception => e
+      e.to_s[/401/].should != nil
+    end
+  end
 
 
 
@@ -116,8 +132,7 @@ describe "OpenUriAndWrite" do
   after(:all) do
     # File.delete(@base_uri + 'webdav_test.txt')
     # Shut down webdav server:
-    # The server takes a few seconds to stop, so we just keep it running.
-    # Process.kill('SIGKILL', @pid) rescue nil
+    stop_webdav_server
   end
 
 end

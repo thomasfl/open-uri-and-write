@@ -60,9 +60,8 @@ end
 
 
 # Starts a WebDAV server using dav4rack and unicorn
-def start_dav4rack(port, options)
-
-  options = {:resource_class => MyResource, :root => Dir.pwd }
+def start_dav4rack(port, root)
+  options = {:resource_class => MyResource, :root => root }
 
   app = Rack::Builder.new do
     use Rack::ShowExceptions
@@ -73,16 +72,24 @@ def start_dav4rack(port, options)
   end.to_app
 
   runners = []
+
   runners << lambda do |x|
-    print 'Looking for unicorn... '
-    require 'unicorn'
-    puts 'OK'
-    if(Unicorn.respond_to?(:run))
-      Unicorn.run(x, :listeners => ["0.0.0.0:#{port}"])
-    else
-      Unicorn::HttpServer.new(x, :listeners => ["0.0.0.0:#{port}"]).start.join
-    end
+    puts 'Loading WEBrick'
+    Rack::Handler::WEBrick.run(x, :Port => port)
   end
+
+# If tests don't run fast enough. Comment in this code, and don't kill the server in "after(:all) do"
+#
+#   runners << lambda do |x|
+#     print 'Looking for unicorn... '
+#     require 'unicorn'
+#     puts 'OK'
+#     if(Unicorn.respond_to?(:run))
+#       Unicorn.run(x, :listeners => ["0.0.0.0:#{port}"])
+#     else
+#       Unicorn::HttpServer.new(x, :listeners => ["0.0.0.0:#{port}"]).start.join
+#     end
+#   end
 
   begin
     runner = runners.shift

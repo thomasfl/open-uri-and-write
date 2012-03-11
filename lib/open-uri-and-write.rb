@@ -86,7 +86,8 @@ class WebDavAgent < StringIO
 
 end
 
-# Monkeypatching
+# Kernel extensions
+# Careful monkeypatching
 module Kernel
   private
   alias open_uri_and_write_original open # :nodoc:

@@ -38,19 +38,26 @@ class WebDavAgent < StringIO
       password = ENV['DAVPASS']
     else
       osx =  (RUBY_PLATFORM =~ /darwin/)
-      if(osx)then
-
-        # TODO Do not crash if 'osx_keychain' is not present!
-        require 'osx_keychain'
-        keychain = OSXKeychain.new
-        password = keychain[@uri.host, username ]
-        if(!password)
-          password = ask("Password for for '#{username}@#{@uri.host}: ") {|q| q.echo = "*"}
-          keychain[@uri.host, username] = password
-          puts "Password for '#{username}@#{@uri.host}' stored on OS X KeyChain."
+      osx_keychain = false
+      if(osx)
+        begin
+          require 'osx_keychain'
+          osx_keychain = true
+        rescue LoadError
         end
+      end
+      if(osx_keychain)then
+
+          keychain = OSXKeychain.new
+          password = keychain[@uri.host, username ]
+          if(!password)
+            password = ask("Password for for '#{username}@#{@uri.host}: ") {|q| q.echo = "*"}
+            keychain[@uri.host, username] = password
+            puts "Password for '#{username}@#{@uri.host}' stored on OS X KeyChain."
+          end
+
       else
-        password = ask("Password for for '#{username}@#{@uri.host}: ") {|q| q.echo = "*"}
+        password = ask("Password for '#{username}@#{@uri.host}: ") {|q| q.echo = "*"}
       end
     end
     @dav.credentials(username, password)

@@ -3,7 +3,8 @@ OpenUriAndWrite
 
 OpenUriAndWrite is an easy to use wrapper for Net::Dav, making it as easy to write to WebDAV enabled webservers as local files.
 
-# Examples
+Examples
+--------
 
 It is possible to open an http/https URL and write to it as though it were a local file:
 
@@ -13,7 +14,7 @@ It is possible to open an http/https URL and write to it as though it were a loc
   }
 ```
 
-A more compact way would be:
+With method chaining it gets more compact:
 
 ```ruby
   open("http://www.ruby-lang.org/open_uri_and_write.html","w").puts "<h1>OpenUriAndWrite</h1>"
@@ -31,28 +32,8 @@ Directories are created the same way as local files:
   Dir.mkdir("http://www.ruby-lang.org/open_uri_and_write")
 ```
 
-# Proppatch and Propfind
-
-The only difference between local files and directories and remote files and directories on webdav servers, is that they both can have an infinite amount of properties. Properties are set as a xml snippet with proppatch() and accessed with propfind().
-
-```ruby
-    file = File.open('http://www.ruby-lang.org/open_uri_and_write.html','w')
-    file.proppatch('<D:Author>Thomas Flemming</D:Author>')
-    properties_as_xml = Dir.propfind("http://www.ruby-lang.org")
-```
-
-# Interoperability with OpenURI
-
-If no filemode is specified when using open on url, standard 'open-uri' will be used.
-
-```ruby
-  puts open("http://www.ruby-lang.org").read()  # Use 'open-uri'
-  open('http://www.ruby-lang.org/my_page.html','w').puts("<h1>HTML</h1>") # Use 'open-uri-and-write'
-```
-
-To not interfer with the 'open-uri' standard library, the 'open-uri-and-write' gem is only active in file modes 'w','a','w+','a+' and 'r+'.
-
-# Authentication
+Authentication
+--------------
 
 By default 'open-uri-and-write' will prompt for username and password when executing scripts:
 
@@ -92,14 +73,38 @@ On OS X passwords typed in by the user will be stored encrypted in the Keychain 
 
 The next time this script is executed, it will not prompt for password.
 
-# Install
+Proppatch and Propfind
+----------------------
+
+The only difference between local files and directories and remote files and directories on webdav servers, is that they both can have an infinite amount of properties. Properties are set as a xml snippet with proppatch() and accessed with propfind().
+
+```ruby
+    file = File.open('http://www.ruby-lang.org/open_uri_and_write.html','w')
+    file.proppatch('<D:Author>Thomas Flemming</D:Author>')
+    properties_as_xml = Dir.propfind("http://www.ruby-lang.org")
+```
+
+Interoperability with OpenURI
+-----------------------------
+
+If no filemode is specified when using open on url, standard 'open-uri' will be used.
+
+```ruby
+  puts open("http://www.ruby-lang.org").read()  # Use 'open-uri'
+  open('http://www.ruby-lang.org/my_page.html','w').puts("<h1>HTML</h1>") # Use 'open-uri-and-write'
+```
+
+To not interfer with the 'open-uri' standard library, the 'open-uri-and-write' gem is only active in file modes 'w','a','w+','a+' and 'r+'.
+
+Install
+-------
 
 ```
   $ gem install open-uri-and-write
 ```
 
-# Testing
-
+Testing
+-------
 To run all tests:
 
 ```
@@ -108,12 +113,14 @@ To run all tests:
 
 The tests will start a webserver with webdav at startup, and close it down before finishing.
 
-# Credits
+Credits
+-------
 
   * Tanaka Akira for the inspiration taken from 'open-uri' standard library.
   * Miron Cuperman for the 'net/dav' gem used to access webdav servers.
 
-# Author
+Author
+------
 
 Thomas Flemming
 

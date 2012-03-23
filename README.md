@@ -116,8 +116,8 @@ The tests will start a webserver with webdav at startup, and close it down befor
 Credits
 -------
 
-  * Tanaka Akira for the inspiration taken from 'open-uri' standard library.
-  * Miron Cuperman for the 'net/dav' gem used to access webdav servers.
+  * Tanaka Akira for the inspiration taken from ['open-uri'](https://github.com/ruby/ruby/blob/trunk/lib/open-uri.rb) standard library.
+  * Miron Cuperman for the ['net/dav'](https://github.com/devrandom/net_dav) gem used to access webdav servers.
 
 Author
 ------

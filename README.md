@@ -42,19 +42,14 @@ The only difference between local files and directories and remote files and dir
 
 # Interoperability with OpenURI
 
-If no filemode is specified when using open on url, open-uri will be used.
-
-To not interfer with the 'open-uri' standard library, the 'open-uri-and-write' gem is only active in file modes 'w','a','w+','a+' and 'r+':
-
-```ruby
-  open('http://www.ruby-lang.org/my_page.html','w').puts("<h1>HTML</h1>") # Use 'open-uri-and-write'
-```
-
-If no filemode is supplied, 'open-uri' is used to read url's:
+If no filemode is specified when using open on url, standard 'open-uri' will be used.
 
 ```ruby
   puts open("http://www.ruby-lang.org").read()  # Use 'open-uri'
+  open('http://www.ruby-lang.org/my_page.html','w').puts("<h1>HTML</h1>") # Use 'open-uri-and-write'
 ```
+
+To not interfer with the 'open-uri' standard library, the 'open-uri-and-write' gem is only active in file modes 'w','a','w+','a+' and 'r+'.
 
 # Authentication
 

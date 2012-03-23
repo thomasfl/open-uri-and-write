@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/dav4rack_testserver')
 
 # To run:
-#  $ ruby spec/integration/open-uri-and-write-spec.rb
+#  $ rake spec
 
 describe "OpenUriAndWrite" do
 
@@ -11,7 +11,9 @@ describe "OpenUriAndWrite" do
     @base_uri = "http://localhost:3003/"
   end
 
-  before(:each) do
+  after(:all) do
+    # Shut down webdav server:
+    stop_webdav_server
   end
 
   it "should write to local file normally" do
@@ -24,14 +26,13 @@ describe "OpenUriAndWrite" do
     open(filename).read.strip.should == timestamp
   end
 
-  it "should write files to webdav server" do
+  it "should write files to webdav server and standard lib open-uri" do
     timestamp = Time.now.to_s
     webdav_url = @base_uri + 'webdav_test_1.txt'
     file = open(webdav_url,'w')
     file.puts timestamp
     file.close
 
-    # use standard lib 'open-uri' to read:
     file = open(webdav_url).read.strip.should == timestamp
   end
 
@@ -71,68 +72,103 @@ describe "OpenUriAndWrite" do
     webdav_url = @base_uri + filename
     open(webdav_url,'w').puts(Time.now.to_s)
 
-    # properties = open(webdav_url,'w').propfind
-    # property = properties.to_s[/publish-date>([^<]*)/,1]
-    # puts "Prop:" + property.to_s
-
     publish_date = Time.now.httpdate.to_s
     open(webdav_url,'w').proppatch("<D:publish-date>#{publish_date}</D:publish-date>")
     properties = open(webdav_url,'w').propfind
     property = properties.to_s[/publish-date>([^<]*)/,1]
-    # publish_date = properties.xpath("//publish-date","D" => "DAV").text
-
     property.should == publish_date
   end
 
-  # TODO test authentication
+  it "should append to files" do
+    file = open(@base_uri + "append_file_test.txt", "w")
+    file.puts "Line 1"
+    file.puts "Line 2"
+    file.close
 
-  # TODO Directories
+    file = open(@base_uri + "append_file_test.txt", "a")
+    file.puts "Line 3"
+    file.puts "Line 4"
+    file.close
+
+    file = open(@base_uri + "append_file_test.txt")
+    lines = file.readlines
+    file.close
+    lines[3].should eql("Line 4\n")
+  end
+
   it "should create and delete directory" do
     # timestamp = Time.now.to_s
-    webdav_url = @base_uri + 'new_folder'
+    webdav_url = @base_uri + 'new_test_folder'
     Dir.mkdir(webdav_url)
     File.exists?(webdav_url).should == true
 
     Dir.rmdir(webdav_url)
+    # There seems to be a bug in our testserver that prevent it from deleting files
     # File.exists?(webdav_url).should == false
-
-    # TODO let 'delete' and 'unlink' be aliases for 'rmdir'
-    # Support Dir.pwd, Dir.directory?
   end
 
+  # TODO Test this in a separate script just to be sure
   it "should not matter which order the rubygems 'open-uri' and 'open-uri-and-write' is loaded" do
     # http://ruby-doc.org/core-1.9.3/Object.html
     # http://stackoverflow.com/questions/335530/how-do-you-detect-that-monkey-patching-has-occurred-in-ruby
     # http://blog.sidu.in/2007/12/rubys-methodadded.html
-    
   end
 
-
-  it "should to handle username and password supplied as parameter to open" do
-    # TODO: This is not documented!
+  it "should handle username and password supplied as parameter to open" do
     webdav_url = @base_uri + 'yet_another_testfile.txt'
-    file = open(webdav_url, 'w', :webdav_username => 'username', :webdav_password => 'secret')
+    file = open(webdav_url, 'w', :username => 'username', :password => 'secret')
+    file.puts "Content"
+    file.close
+
     begin
+      file = open(webdav_url, 'w+', :username => 'username', :password => 'secret')
       file.read
       should fail
     rescue Exception => e
-      e.to_s[/401/].should != nil
     end
   end
 
+# TODO Test all modes:
 
+# r
+# Read-only mode. The file pointer is placed at the beginning of
+# the file. This is the default mode.
+#
+# r+
+# Read-write mode. The file pointer will be at the beginning of the file.
+#
+# w
+# Write-only mode.
+#   - Overwrites the file if the file exists.
+#   - If the file does not exist, creates a new file for writing.
+#
+# w+
+# Read-write mode.
+#   - Overwrites the existing file if the file exists.
+#   - If the file does not exist, creates a new file for reading and writing.
+#
+# a
+# Write-only mode.
+#    - The file pointer is at the end of the file if the file exists.
+#    - That is, the file is in the append mode.
+#    - If the file does not exist, it creates a new file for writing.
+#
+# a+
+# Read and write mode.
+#    - The file pointer is at the end of the file if the file exists.
+#    - The file opens in the append mode.
+#    - If the file does not exist, it creates a new file for reading and writing.
+#
+# r+, w+, and a+ all do read-write. w+ truncates the file. a+ appends.
+# w+ and a+ both create the file if it does not exist.)
+
+#   # TODO test authentication
 
   after(:each) do
     url = @base_uri + 'webdav_test.txt'
     if(File.exists?(url))
       File.delete(url)
     end
-  end
-
-  after(:all) do
-    # File.delete(@base_uri + 'webdav_test.txt')
-    # Shut down webdav server:
-    stop_webdav_server
   end
 
 end

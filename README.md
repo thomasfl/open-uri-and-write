@@ -5,7 +5,7 @@ OpenUriAndWrite is an easy to use wrapper for Net::Dav, making it as easy to wri
 
 # Examples
 
-It is possible to open an http, https URL and write to it as though it were a file:
+It is possible to open an http/https URL and write to it as though it were a local file:
 
 ```ruby
   open("http://www.ruby-lang.org/open_uri_and_write.html","w") {|f|
@@ -25,7 +25,7 @@ Files can be deleted as local files:
   File.delete("http://www.ruby-lang.org/open_uri_and_write.html")
 ```
 
-Directories are created the same way as local files.
+Directories are created the same way as local files:
 
 ```ruby
   Dir.mkdir("http://www.ruby-lang.org/open_uri_and_write")
@@ -37,38 +37,80 @@ The only difference between local files and directories and remote files and dir
 
 ```ruby
     File.open("http://www.ruby-lang.org/open_uri_and_write.html","w").proppatch('<o:Author>Douglas Groncki</o:Author>')
-    props = Dir.propfind("http://www.ruby-lang.org") # Returns XML
+    properties_as_xml = Dir.propfind("http://www.ruby-lang.org")
 ```
 
 # Interoperability with OpenURI
 
-To not interfer with the 'open-uri' standard library, the 'open-uri-and-write' gem is only active in file modes 'w','a','w+' and 'a+':
+If no filemode is specified when using open on url, open-uri will be used.
+
+To not interfer with the 'open-uri' standard library, the 'open-uri-and-write' gem is only active in file modes 'w','a','w+','a+' and 'r+':
 
 ```ruby
-  open("http://www.ruby-lang.org/open_uri_and_write.html","w").puts("<h1>HTML</h1>") # open-uri-and-write
+  open('http://www.ruby-lang.org/my_page.html','w').puts("<h1>HTML</h1>") # Use 'open-uri-and-write'
 ```
 
-If not any filemode is supplied, 'open-uri' is used:
+If no filemode is supplied, 'open-uri' is used to read url's:
 
 ```ruby
-  puts open("http://www.ruby-lang.org").read()  # open-uri
+  puts open("http://www.ruby-lang.org").read()  # Use 'open-uri'
 ```
 
 # Authentication
 
-As a default 'open-uri-and-write' will prompt for username and password. Credentials can be supplied with the DAVUSER and DAVPASS environment variables. If enviorment variables are not set, ruby will prompt for username and password. On OS X the password will then be stored encrypted in the Keychain and reused later.
+By default 'open-uri-and-write' will prompt for username and password when executing scripts:
+
+```
+  $ ruby webdav_test.rb
+  Username for www.example.com: scott
+  Password for 'scott@www.example.com: *****
+```
+
+Credentials can be supplied with the DAVUSER and DAVPASS environment variables.
+
+```
+  $ export DAVUSER=scott
+  $ export DAVPASS=tiger
+  $ ruby webdav_test.rb
+```
+
+```ruby
+  ENV['DAVUSER'] = 'scott'
+  ENV['DAVPASS'] = 'tiger'
+```
+
+Another option is to supply username and password as arguments to open:
+
+```ruby
+   file = open('https://www.example.com/', 'w', :username => 'scott', :password => 'tiger')
+```
+
+On OS X passwords typed in by the user will be stored encrypted in the Keychain and reused later.
+
+```
+  $ export DAVUSER=scott
+  $ ruby webdav_test.rb
+  Password for 'scott@www.example.com': *****
+  Password for 'scott@www.example.com' stored on OS X KeyChain.
+```
+
+The next time this script is executed, it will not prompt for password.
 
 # Install
 
-This is work in progress, and not pushed as a gem yet.
+```
+  $ gem install open-uri-and-write
+```
 
 # Testing
 
-The tests will start a webserver at startup. To run all tests simply:
+To run all tests:
 
 ```
-  $ ruby spec/integration/open-uri-and-write-spec.rb
+  $ rake spec
 ```
+
+The tests will start a webserver with webdav at startup, and close it down before finishing.
 
 # Credits
 

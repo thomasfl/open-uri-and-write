@@ -4,6 +4,7 @@ require 'open-uri'
 require 'net/dav'
 require 'highline/import'
 
+
 # A wrapper for Net::Dav that acts as a replacement for the File class
 class WebDavAgent < StringIO
 
@@ -14,22 +15,29 @@ class WebDavAgent < StringIO
     super("")
     @url = url
     @uri = URI.parse(url)
-    if(rest.size > 0 and rest.first.to_s[/^w/])
-      @dav = Net::DAV.new(@url)
-      options = rest[1]
-      if(options && options[:webdav_username] && options[:webdav_password])
-        @dav.credentials(options[:webdav_username], options[:webdav_password])
-      else
-        set_credentials
+    if(rest.size > 0)
+      if(rest.first.to_s[/^[wa]/])
+        @dav = Net::DAV.new(@url)
+        options = rest[1]
+        if(options && options[:username] && options[:password])
+          @dav.credentials(options[:username], options[:password])
+        else
+          set_credentials
+        end
       end
+
+      if(rest.first.to_s[/^a/])
+        write(@dav.get(@url)) # write to stringIO
+      end
+
     end
   end
 
   def set_credentials
     if(ENV['DAVUSER'])
       username = ENV['DAVUSER']
-    elsif(ENV['USER'])
-      username = ENV['USER']
+    # elsif(ENV['USER'])
+    #  username = ENV['USER']
     else
       username = ask("Username for #{@uri.host}: ")
     end
@@ -37,7 +45,7 @@ class WebDavAgent < StringIO
     if(ENV['DAVPASS'])
       password = ENV['DAVPASS']
     else
-      osx =  (RUBY_PLATFORM =~ /darwin/)
+      osx = (RUBY_PLATFORM =~ /darwin/)
       osx_keychain = false
       if(osx)
         begin
@@ -47,11 +55,10 @@ class WebDavAgent < StringIO
         end
       end
       if(osx_keychain)then
-
           keychain = OSXKeychain.new
           password = keychain[@uri.host, username ]
           if(!password)
-            password = ask("Password for for '#{username}@#{@uri.host}: ") {|q| q.echo = "*"}
+            password = ask("Password for '#{username}@#{@uri.host}: ") {|q| q.echo = "*"}
             keychain[@uri.host, username] = password
             puts "Password for '#{username}@#{@uri.host}' stored on OS X KeyChain."
           end
@@ -68,14 +75,8 @@ class WebDavAgent < StringIO
     @dav.put_string(@url, string)
   end
 
-
   def read
     @dav.get(@url)
-  end
-
-  def append(string)
-    # TODO
-    print "Debug: appending #{string} to #{@url}\r\n"
   end
 
   def proppatch(xml_snippet)
@@ -87,7 +88,6 @@ class WebDavAgent < StringIO
   end
 
   def close
-    # puts "Closing..."
     @dav.put_string(@url, string)
   end
 
@@ -102,8 +102,12 @@ module Kernel
   def open(name, *rest, &block) # :doc:
     if name.respond_to?(:open)
       name.open(*rest, &block)
-    elsif name.respond_to?(:to_s) and name[/^(https?):\/\//] and rest.size > 0 and rest.first.to_s[/^w/]
-      webdav_agent = WebDavAgent.new(name, rest)
+    elsif name.respond_to?(:to_s) and
+          name[/^(https?):\/\//] and
+          rest.size > 0 and
+          rest.first.to_s[/^[rwa]/] and
+          not (rest.first.to_s == 'r' or rest.first.to_s == 'rb')
+          webdav_agent = WebDavAgent.new(name, rest)
       if(block)
         yield webdav_agent
       else

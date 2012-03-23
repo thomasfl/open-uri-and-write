@@ -1,7 +1,7 @@
 require 'rubygems'
 require 'dav4rack'
 require 'dav4rack/file_resource'
-require 'unicorn'
+# require 'unicorn'
 require 'pathname'
 
 
@@ -74,22 +74,9 @@ def start_dav4rack(port, root)
   runners = []
 
   runners << lambda do |x|
-    puts 'Loading WEBrick'
+    puts 'Starting WEBrick'
     Rack::Handler::WEBrick.run(x, :Port => port)
   end
-
-# If tests don't run fast enough. Comment in this code, and don't kill the server in "after(:all) do"
-#
-#   runners << lambda do |x|
-#     print 'Looking for unicorn... '
-#     require 'unicorn'
-#     puts 'OK'
-#     if(Unicorn.respond_to?(:run))
-#       Unicorn.run(x, :listeners => ["0.0.0.0:#{port}"])
-#     else
-#       Unicorn::HttpServer.new(x, :listeners => ["0.0.0.0:#{port}"]).start.join
-#     end
-#   end
 
   begin
     runner = runners.shift
@@ -107,7 +94,7 @@ if __FILE__ == $0
   options = {}
   # options[:username] = "davuser"
   # options[:password] = "davpass"
-  path = Pathname.new(File.expand_path(File.dirname(__FILE__))).parent.to_s + '/fixtures'
+  path = '/tmp/webdav_server_root'
   puts "Starting server in " + path
   options[:root] = path
 

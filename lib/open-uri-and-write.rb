@@ -6,7 +6,7 @@ require 'highline/import'
 
 
 # A wrapper for Net::Dav that acts as a replacement for the File class
-class WebDavAgent < StringIO
+class OpenUriAndWrite < StringIO
 
   alias_method :original_puts, :puts
   attr_accessor :dav
@@ -107,7 +107,7 @@ module Kernel
           rest.size > 0 and
           rest.first.to_s[/^[rwa]/] and
           not (rest.first.to_s == 'r' or rest.first.to_s == 'rb')
-          webdav_agent = WebDavAgent.new(name, rest)
+          webdav_agent = OpenUriAndWrite.new(name, rest)
       if(block)
         yield webdav_agent
       else
@@ -122,7 +122,7 @@ module Kernel
 end
 
 # Store credentials for later use in sesssion.
-class WebDavCredentialsPool
+class OpenUriAndWriteCredentialsStore
 
   def self.get_connection_for_url(url)
     hostname = URI.parse(url).host.to_s
@@ -132,7 +132,7 @@ class WebDavCredentialsPool
     if($_webdav_credentials_pool[hostname])
       return $_webdav_credentials_pool[hostname]
     else(!$_webdav_credentials_pool[hostname])
-      agent = WebDavAgent.new(url, ['w'])
+      agent = OpenUriAndWrite.new(url, ['w'])
       $_webdav_credentials_pool[hostname] = agent.dav
       return agent.dav
     end
@@ -151,7 +151,7 @@ class Dir
 
   def self.mkdir(name)
     if name.respond_to?(:to_s) and name[/^(https?):\/\//]
-      dav = WebDavCredentialsPool.get_connection_for_url(name)
+      dav = OpenUriAndWriteCredentialsStore.get_connection_for_url(name)
       dav.mkdir(name)
     else
       self.original_mkdir(name)
@@ -160,7 +160,7 @@ class Dir
 
   def self.rmdir(name)
     if name.respond_to?(:to_s) and name[/^(https?):\/\//]
-      dav = WebDavCredentialsPool.get_connection_for_url(name)
+      dav = OpenUriAndWriteCredentialsStore.get_connection_for_url(name)
       dav.delete(name)
     else
       self.original_rmdir(name)
@@ -169,7 +169,7 @@ class Dir
 
   def self.propfind(name)
     if name.respond_to?(:to_s) and name[/^(https?):\/\//]
-      dav = WebDavCredentialsPool.get_connection_for_url(name)
+      dav = OpenUriAndWriteCredentialsStore.get_connection_for_url(name)
       dav.propfind(name)
     else
       # TODO Throw illegal action exception
@@ -178,7 +178,7 @@ class Dir
 
   def self.proppatch(name,xml_snippet)
     if name.respond_to?(:to_s) and name[/^(https?):\/\//]
-      dav = WebDavCredentialsPool.get_connection_for_url(name)
+      dav = OpenUriAndWriteCredentialsStore.get_connection_for_url(name)
       dav.propfind(name, xml_snippet)
     else
       # TODO Throw illegal action exception
@@ -198,7 +198,7 @@ class File
 
   def self.exists?(name)
     if(name[/https?:\/\//])
-      dav = WebDavCredentialsPool.get_connection_for_url(name)
+      dav = OpenUriAndWriteCredentialsStore.get_connection_for_url(name)
       dav.exists?(name)
     else
       self.original_exists?(name)
@@ -214,7 +214,7 @@ class File
     end
     filenames.each do |filename|
       if(filename[/^(https?):\/\//])
-        dav = WebDavCredentialsPool.get_connection_for_url(filename)
+        dav = OpenUriAndWriteCredentialsStore.get_connection_for_url(filename)
         dav.delete(filename)
       else
         self.original_delete(filename)
@@ -226,7 +226,7 @@ class File
     if name.respond_to?(:open)
       name.open(*rest, &block)
     elsif name.respond_to?(:to_s) and name[/^(https?):\/\//] and rest.size > 0 and rest.first.to_s[/^w/]
-      webdav_agent = WebDavAgent.new(name, rest)
+      webdav_agent = OpenUriAndWrite.new(name, rest)
       if(block)
         yield webdav_agent
       else

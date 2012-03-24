@@ -3,6 +3,10 @@ OpenUriAndWrite
 
 OpenUriAndWrite is an easy to use wrapper for Net::Dav, making it as easy to write to WebDAV enabled webservers as local files.
 
+# This is work in progress
+
+File operations work, but there's still work to be done on directory operations.
+
 Examples
 --------
 

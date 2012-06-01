@@ -9,14 +9,15 @@ require 'highline/import'
 class OpenUriAndWrite < StringIO
 
   alias_method :original_puts, :puts
-  attr_accessor :dav
+  attr_accessor :dav, :filemode
 
   def initialize(url, rest)
     super("")
     @url = url
     @uri = URI.parse(url)
     if(rest.size > 0)
-      if(rest.first.to_s[/^[wa]/])
+      @filemode = rest.first.to_s
+      if(@filemode[/^[rwa]/])
         @dav = Net::DAV.new(@url)
         options = rest[1]
         if(options && options[:username] && options[:password])
@@ -26,8 +27,8 @@ class OpenUriAndWrite < StringIO
         end
       end
 
-      if(rest.first.to_s[/^a/])
-        write(@dav.get(@url)) # write to stringIO
+      if(@filemode[/^a/])
+        write(@dav.get(@url)) # Write to StringIO
       end
 
     end
@@ -36,10 +37,9 @@ class OpenUriAndWrite < StringIO
   def set_credentials
     if(ENV['DAVUSER'])
       username = ENV['DAVUSER']
-    # elsif(ENV['USER'])
-    #  username = ENV['USER']
     else
       username = ask("Username for #{@uri.host}: ")
+      # TODO: Store username and hostname in .open-uri-and-write-hosts
     end
 
     if(ENV['DAVPASS'])
@@ -71,6 +71,10 @@ class OpenUriAndWrite < StringIO
   end
 
   def puts(string)
+    if(@filemode[/^r/])
+      raise IOError.new(true), "not opened for writing"
+    end
+
     super(string)
     @dav.put_string(@url, string)
   end
@@ -105,9 +109,8 @@ module Kernel
     elsif name.respond_to?(:to_s) and
           name[/^(https?):\/\//] and
           rest.size > 0 and
-          rest.first.to_s[/^[rwa]/] and
-          not (rest.first.to_s == 'r' or rest.first.to_s == 'rb')
-          webdav_agent = OpenUriAndWrite.new(name, rest)
+          rest.first.to_s[/^[rwa]/]
+      webdav_agent = OpenUriAndWrite.new(name, rest)
       if(block)
         yield webdav_agent
       else

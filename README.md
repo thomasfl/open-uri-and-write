@@ -100,6 +100,34 @@ If no filemode is specified when using open on url, standard 'open-uri' will be 
 
 To not interfer with the 'open-uri' standard library, the 'open-uri-and-write' gem is only active in file modes 'w','a','w+','a+' and 'r+'.
 
+File access modes
+===========================
+
+
+
+r
+Read-only mode. The file pointer is placed at the beginning of the file. This is the default mode.
+
+r+
+Read-write mode. The file pointer will be at the beginning of the file.
+
+w
+Write-only mode. Overwrites the file if the file exists. If the file does not exist, creates a new file for writing.
+
+w+
+Read-write mode. Overwrites the existing file if the file exists. If the file does not exist, creates a new file for reading and writing.
+
+a
+Write-only mode. The file pointer is at the end of the file if the file exists. That is, the file is in the append mode. If the file does not exist, it creates a new file for writing.
+
+a+
+Read and write mode. The file pointer is at the end of the file if the file exists. The file opens in the append mode. If the file does not exist, it creates a new file for reading and writing.
+
+(empshasis mine.)
+
+r+, w+, and a+ all do read-write. w+ truncates the file. a+ appends. w+ and a+ both create the file if it does not exist.)
+```
+
 Install
 -------
 

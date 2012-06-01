@@ -128,11 +128,34 @@ describe "OpenUriAndWrite" do
     end
   end
 
+  it "should not use 'open-uri' to read file in 'r' filemode" do
+    timestamp = Time.now.to_s
+    webdav_url = @base_uri + 'webdav_r_filemode_test.txt'
+    file = open(webdav_url,'w')
+    file.puts timestamp
+    file.class.should == OpenUriAndWrite
+    file.close
+
+    file = open(webdav_url)
+    file.class.should == StringIO # StringIO means 'open-uri' gem is beeing used
+    file.read.strip.should == timestamp
+
+    file = open(webdav_url,'r')
+    file.class.should == OpenUriAndWrite
+    file.read.strip.should == timestamp
+    begin
+      file.puts("this should not be written")
+      fail
+    rescue IOError => ioError
+    end
+    file.close
+  end
+
 # TODO Test all modes:
 
-# r
-# Read-only mode. The file pointer is placed at the beginning of
-# the file. This is the default mode.
+# OK r
+#    Read-only mode. The file pointer is placed at the beginning of
+#    the file. This is the default mode.
 #
 # r+
 # Read-write mode. The file pointer will be at the beginning of the file.
@@ -161,6 +184,8 @@ describe "OpenUriAndWrite" do
 #
 # r+, w+, and a+ all do read-write. w+ truncates the file. a+ appends.
 # w+ and a+ both create the file if it does not exist.)
+
+# TODO: Store username and hostname in .open-uri-and-write-hosts
 
 #   # TODO test authentication
 

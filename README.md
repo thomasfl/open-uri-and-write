@@ -3,10 +3,6 @@ OpenUriAndWrite
 
 OpenUriAndWrite is an easy to use wrapper for Net::Dav, making it as easy to write to WebDAV enabled webservers as local files.
 
-# Disclaimer
-
-This is work in progress. You can write files and crate directories, but there's still work to do on reading directories and at the time one filemodes "w" and "a" is supported.
-
 Examples
 --------
 
@@ -38,6 +34,7 @@ Directories are created the same way as local files:
 
 Authentication
 --------------
+Credentials can be supplied either as environment variables, parameters or by user prompt. On OSX there is support for making it easy to store credentials encrypted in the keychain.
 
 By default 'open-uri-and-write' will prompt for username and password when executing scripts:
 
@@ -80,7 +77,7 @@ The next time this script is executed, it will not prompt for password.
 Proppatch and Propfind
 ----------------------
 
-The only difference between local files and directories and remote files and directories on webdav servers, is that they both can have an infinite amount of properties. Properties are set as a xml snippet with proppatch() and accessed with propfind().
+In difference to files and directories on local filesystems, files and directories on WebDAV servers can have custom properties. Properties are set as a xml snippet with proppatch() and accessed with propfind().
 
 ```ruby
     file = File.open('http://www.ruby-lang.org/open_uri_and_write.html','w')
@@ -100,33 +97,23 @@ If no filemode is specified when using open on url, standard 'open-uri' will be 
 
 To not interfer with the 'open-uri' standard library, the 'open-uri-and-write' gem is only active in file modes 'w','a','w+','a+' and 'r+'.
 
-File access modes
+Supported file access modes
 ===========================
 
+ *r Read-only mode. The file pointer is placed at the beginning of the file. This is the default mode.
 
+ *r+ Read-write mode. The file pointer will be at the beginning of the file.
 
-r
-Read-only mode. The file pointer is placed at the beginning of the file. This is the default mode.
+ *w Write-only mode. Overwrites the file if the file exists. If the file does not exist, creates a new file for writing.
 
-r+
-Read-write mode. The file pointer will be at the beginning of the file.
+ *w+ Read-write mode. Overwrites the existing file if the file exists. If the file does not exist, creates a new file for reading and writing.
 
-w
-Write-only mode. Overwrites the file if the file exists. If the file does not exist, creates a new file for writing.
+ *a Write-only mode. The file pointer is at the end of the file if the file exists. That is, the file is in the append mode. If the file does not exist, it creates a new file for writing.
 
-w+
-Read-write mode. Overwrites the existing file if the file exists. If the file does not exist, creates a new file for reading and writing.
-
-a
-Write-only mode. The file pointer is at the end of the file if the file exists. That is, the file is in the append mode. If the file does not exist, it creates a new file for writing.
-
-a+
-Read and write mode. The file pointer is at the end of the file if the file exists. The file opens in the append mode. If the file does not exist, it creates a new file for reading and writing.
-
-(empshasis mine.)
+ *a+ Read and write mode. The file pointer is at the end of the file if the file exists. The file opens in the append mode. If the file does not exist, it creates a new file for reading and writing.
 
 r+, w+, and a+ all do read-write. w+ truncates the file. a+ appends. w+ and a+ both create the file if it does not exist.)
-```
+
 
 Install
 -------
@@ -144,6 +131,10 @@ To run all tests:
 ```
 
 The tests will start a webserver with webdav at startup, and close it down before finishing.
+
+Future work
+-----------
+This is work in progress. You can write files and crate directories, but there's still work to do on reading directories and at the time one filemodes "w" and "a" is supported.
 
 Credits
 -------

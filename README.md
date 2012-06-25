@@ -17,13 +17,13 @@ It is possible to open an http/https URL and write to it as though it were a loc
   }
 ```
 
-Delete files on webserver:
+Delete file on server:
 
 ```ruby
   File.delete("http://www.ruby-lang.org/open_uri_and_write.html")
 ```
 
-Create directory on web server:
+Create directory on server:
 
 ```ruby
   Dir.mkdir("http://www.ruby-lang.org/open_uri_and_write")

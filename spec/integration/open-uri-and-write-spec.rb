@@ -133,7 +133,7 @@ describe "OpenUriAndWrite" do
     webdav_url = @base_uri + 'webdav_r_filemode_test.txt'
     file = open(webdav_url,'w')
     file.puts timestamp
-    file.class.should == OpenUriAndWrite
+    file.class.should == OpenUriAndWrite::Handle
     file.close
 
     file = open(webdav_url)
@@ -141,7 +141,7 @@ describe "OpenUriAndWrite" do
     file.read.strip.should == timestamp
 
     file = open(webdav_url,'r')
-    file.class.should == OpenUriAndWrite
+    file.class.should == OpenUriAndWrite::Handle
     file.read.strip.should == timestamp
     begin
       file.puts("this should not be written")

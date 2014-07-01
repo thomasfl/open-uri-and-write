@@ -7,7 +7,7 @@ def run_tests
   output = %x[ruby test/test-open-uri-and-write.rb]
   if(output[/Failure:/])
     puts output
-    puts Paint['Failure', :yellow, :bright]
+    puts Paint['Failed to detect changes', :yellow, :bright]
   else
     puts output
     puts Paint['Ok', :green, :bright]

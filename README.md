@@ -1,7 +1,7 @@
 OpenUriAndWrite
 ===============
 
-OpenUriAndWrite is an easy to use gem to makes writing files to WebDAV enabled webservers as easy as writing to local files. The gem prompts for username and password when needed. On OSX passwords are stored in the keychain. WebDAV communication is handled by the Net::Dav library.
+OpenUriAndWrite is an easy to use gem to makes writing files to WebDAV enabled webservers as easy as writing to local files. The gem prompts for username and password when needed. On OSX passwords can be stored encrypted in the keychain. This is a wrapper for the Net::Dav gem.
 
 Examples
 --------

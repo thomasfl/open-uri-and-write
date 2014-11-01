@@ -6,7 +6,7 @@ OpenUriAndWrite is an easy to use gem to makes writing files to WebDAV enabled w
 Examples
 --------
 
-It is possible to open an http/https URL and write to it as though it were a local file:
+Creating files on webserver is straight forward.
 
 ```ruby
   require 'rubygems'
@@ -45,9 +45,7 @@ OSX users that wishes to store passwords on the keychain need to install this in
 
 Authentication
 --------------
-By default the scripts prompts the user for username and password. The username and hostname are stored in the file ~/.open-uri-and-write-usernames, so the next time only the password has to be typed in. On OSX the password is stored encrypted in the keychain.
-
-Credentials can also supplied as environment variables or options.
+By default the scripts prompts for username and password. The username and hostname are stored in the file ~/.open-uri-and-write-usernames, so the next time only the password has to be typed in. On OSX the password is stored encrypted in the keychain.
 
 Default behaviour if no username or password is set:
 
@@ -60,6 +58,8 @@ Default behaviour if no username or password is set:
   $ ruby webdav_test.rb
   Password for 'scott@www.example.com: *****
 ```
+
+Credentials can also supplied as environment variables or options.
 
 Supplying credentials with the DAVUSER and DAVPASS environment variables:
 
@@ -98,7 +98,8 @@ Note that if you have stored a misspelled password on the OSX Keychain, then you
 Proppatch and Propfind
 ----------------------
 
-In difference to files and directories on local filesystems, files and directories on WebDAV servers can have many custom properties. Properties can be read with til propfindare set as a xml snippet with proppatch() and accessed with propfind().
+In difference to files and directories on local filesystems, files and directories on WebDAV servers can have as many custom properties as you want. Properties are set with File.propfind()
+and set with File.proppatch().
 
 ```ruby
     file = File.open('http://www.ruby-lang.org/open_uri_and_write.html','w')
@@ -109,7 +110,7 @@ In difference to files and directories on local filesystems, files and directori
 Interoperability with OpenURI
 -----------------------------
 
-If no filemode is specified when using open on url, standard 'open-uri' will be used.
+If no filemode is specified when using open on url, the 'open-uri' gem will be used to read.
 
 ```ruby
   puts open("http://www.ruby-lang.org").read()  # Use 'open-uri'
@@ -147,7 +148,7 @@ The tests will start a webserver with webdav at startup, and close it down befor
 
 Future work
 -----------
-This is work in progress. You can write files and crate directories, but there's still work to do on reading directories and at the time one filemodes "r", "w" and "a" is supported.
+This is work in progress. You can write files and crate directories, but there's still work to do on reading directories and at the time only filemodes "r", "w" and "a" is supported.
 
 More protocols like FTP, SCP and Amazon S3 would be useful.
 
@@ -159,7 +160,7 @@ Credits
 -------
 
   * Tanaka Akira for the inspirational ['open-uri'](https://github.com/ruby/ruby/blob/trunk/lib/open-uri.rb) standard ruby library.
-  * Miron Cuperman for the ['net/dav'](https://github.com/devrandom/net_dav) gem used to access webdav servers.
+  * Miron Cuperman for the work done on ['net/dav'](https://github.com/devrandom/net_dav) gem used to access webdav servers.
   * Chris Roberts and the rest of the DAV4Rack for the WebDAV implementation in ruby used for testing this gem.
 
 License
